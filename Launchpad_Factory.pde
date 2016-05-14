@@ -20,7 +20,7 @@ int tick, gameSpeed;
 int score;
 
 //First Game
-ArrayList<Object> fallingBlocks;
+ArrayList<RisingObject> fallingBlocks;
 
 
 void setup() {
@@ -43,8 +43,8 @@ void setup() {
   score = 0;
 
   //First Game
-  fallingBlocks = new ArrayList<Object>();
-  fallingBlocks.add(new Object(1, 4, 0, -1f, 127));
+  fallingBlocks = new ArrayList<RisingObject>();
+  fallingBlocks.add(new RisingObject(1, 4, 0, -1f, 127));
 
   //Midi Setup
   MidiBus.list(); // List all available Midi devices on STDOUT. This will show each device's index and name.

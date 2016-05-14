@@ -25,15 +25,13 @@ class Object{
   }
   
   //Update
-  void update( boolean[][] matrix){
+  void update(boolean[][] matrix){
     floatPos.add(spd);
     pos = new PVector(int(floatPos.x), int(floatPos.y));
     if ((posPrevious.x != pos.x) || (posPrevious.y != pos.y)){
       matrix[int(posPrevious.x)][int(posPrevious.y)] = false;
       posPrevious = new PVector(pos.x, pos.y);
     }
-  if (pos.y==7) velo = 96;
-  else velo = 127;
   }
   
   //Refresh with Launchpad
