@@ -15,16 +15,15 @@ class RisingObject extends Object{
   }
   
   //Object Update
-  void update(boolean[][] matrix){
-    super.update(matrix);
+  void update(){
+    super.update();
     //Check position to change velo
-    if (pos.y==7) velo = 96;
+    if (round(pos.y)==7) velo = 16;
+    else if (round(pos.y)==-1){
+      velo=16;
+      pos.y = 7.4999;
+    }
     else velo = 127;
-  }
-  
-  //Refresh with Launchpad
-  void launchpadRefresh(boolean[][] matrix, int[][] matrixVelo){
-    super.launchpadRefresh(matrix, matrixVelo);
   }
 
 }
