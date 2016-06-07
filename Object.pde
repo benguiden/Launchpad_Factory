@@ -6,7 +6,7 @@ class Object {
 
 
   //Constructors
-  Object(int _x, int _y, float _xspd, float _yspd, int _velo) {
+  Object(float _x, float _y, float _xspd, float _yspd, int _velo) {
     pos = new PVector( _x, _y);
     spd = new PVector( _xspd, _yspd);
     velo = _velo;
@@ -26,7 +26,7 @@ class Object {
     else fill(255, 255, 0); //Yellow
 
     noStroke();
-    rectView(cellOffsetx + (pos.x * cellWidth), cellOffsety + (round(pos.y) * cellHeight), cellWidth, cellHeight, view);
+    if (velo!=0) rectView(cellOffsetx + (pos.x * cellWidth), cellOffsety + ((pos.y) * cellHeight), cellWidth, cellHeight, view);
     
   }
 

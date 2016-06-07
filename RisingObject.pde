@@ -3,27 +3,46 @@
 class RisingObject extends Object{
   
   //Variables
-  
+  boolean rise=true;
+  boolean move;
+  float tick;
   
   //Constructors
   RisingObject(int _x, int _y, float _xspd, float _yspd, int _velo){
     super(_x, _y, _xspd, _yspd, _velo);
+    tick = 30f * (120f/bpm);
+    if ((pos.x == 0) && (pos.y==0)) move = false;
+    else if ((pos.x == 0) && (pos.y==7)) move = false;
+    else if ((pos.x == 7) && (pos.y==0)) move = false;
+    else if ((pos.x == 7) && (pos.y==7)) move = false;
+    else move = true;
   }
   
   RisingObject(int _x, int _y){
     super( _x, _y);
+    tick = 30f * (120f/bpm);
+    if ((pos.x == 0) && (pos.y==0)) move = false;
+    else if ((pos.x == 0) && (pos.y==7)) move = false;
+    else if ((pos.x == 7) && (pos.y==0)) move = false;
+    else if ((pos.x == 7) && (pos.y==7)) move = false;
+    else move = true;
   }
   
   //Object Update
   void update(){
-    super.update();
-    //Check position to change velo
-    if (round(pos.y)==7) velo = 16;
-    else if (round(pos.y)==-1){
-      velo=16;
-      pos.y = 7.4999;
+    if (move){
+      super.update();
+    
+      if (tick<=0){
+        velo = 15;
+        if (pos.x==0) spd.x = 0.5f * (120f/bpm);
+        else if (pos.x==7) spd.x = -0.5f * (120f/bpm);
+        else if (pos.y==0) spd.y = 0.5f * (120f/bpm);
+        else if (pos.y==7) spd.y = -0.5f * (120f/bpm);
+      }
+      if (move) tick--;
     }
-    else velo = 127;
-  }
-
+  }    
+    
+  
 }

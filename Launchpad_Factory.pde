@@ -1,4 +1,5 @@
 import themidibus.*; //Import the library
+import ddf.minim.*;
 
 MidiBus myBus; // The MidiBus
 
@@ -27,10 +28,15 @@ View view = new View(new PVector(), new PVector(width/4, width/4), 0, 0);
 
 //First Game
 ArrayList<RisingObject> fallingBlocks;
+Object dodging;
+float spawnDelay, spawnTick;
 
 
 //Beat
 float bpm = 128.0f;
+Minim minim;
+AudioPlayer music;
+
 
 void setup() {
   size(640, 640);
@@ -39,6 +45,13 @@ void setup() {
   noSmooth();
   
   //Varaibles
+  //Music
+  minim = new Minim(this);
+  music = minim.loadFile("music.mp3");
+  music.play();
+  music.loop();
+  
+  
   //Matrix
   matrix = new boolean[9][8];
   matrixPrevious = new boolean[9][8];
@@ -52,13 +65,19 @@ void setup() {
   score = 0;
   
   //All Games
-  mode = 1;
+  mode = 0;
 
   //First Game
   fallingBlocks = new ArrayList<RisingObject>();
-  for (int i=0; i<3; i++){
-    fallingBlocks.add(new RisingObject(i*2, 2+i*2, 0, -((bpm/frameRate)/frameRate)/64.0f, 127));
-  }
+    //Corners
+    fallingBlocks.add(new RisingObject(0, 0, 0, 0, 15));
+    fallingBlocks.add(new RisingObject(0, 7, 0, 0, 15));
+    fallingBlocks.add(new RisingObject(7, 0, 0, 0, 15));
+    fallingBlocks.add(new RisingObject(7, 7, 0, 0, 15));
+  dodging = new Object(4, 4, 0, 0, 16);
+  spawnDelay = 15f * (120f/bpm);
+  spawnTick = spawnDelay;
+  
 
   //Midi Setup
   myBus = new MidiBus(this, 0, 3); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
@@ -82,8 +101,41 @@ void draw() {
   
   //Update
   //Update Mode 1
-  for (int i = fallingBlocks.size()-1; i >= 0; i--) {
-    fallingBlocks.get(i).update();
+  if (mode==0){
+    
+    dodging.update();
+    for (int i = fallingBlocks.size()-1; i >= 0; i--) {
+      fallingBlocks.get(i).update();
+      if (fallingBlocks.get(i).tick<=0){ //Check if active
+        if ((fallingBlocks.get(i).pos.x>=8) || (fallingBlocks.get(i).pos.x<0) || (fallingBlocks.get(i).pos.y>=8) || (fallingBlocks.get(i).pos.y<0)) fallingBlocks.remove(i);
+      }
+      //Kill Player
+      if ((round(fallingBlocks.get(i).pos.x) == dodging.pos.x) && (round(fallingBlocks.get(i).pos.y) == dodging.pos.y)){
+        for (int j = fallingBlocks.size()-1; j >= 0; j--){
+          if (fallingBlocks.get(j).move) fallingBlocks.remove(j);
+        }
+        break;
+      } 
+    }
+    
+    //Spawn Blocks
+    if (spawnTick<=0){
+      
+      for (int i=0; i<2; i++){
+        int row = int(random(4));
+        int r = int(random(6));
+      
+        if (row==0) fallingBlocks.add(new RisingObject(1+r, 0, 0, 0, 127));
+        else if (row==1) fallingBlocks.add(new RisingObject(1+r, 7, 0, 0, 127));
+        else if (row==2) fallingBlocks.add(new RisingObject(0, 1+r, 0, 0, 127));
+        else if (row==3) fallingBlocks.add(new RisingObject(7, 1+r, 0, 0, 127));
+      
+        spawnTick=spawnDelay;
+      }
+      
+    }
+    
+    spawnTick--;
   }
   
   
@@ -110,14 +162,8 @@ void draw() {
   for (int i = fallingBlocks.size()-1; i >= 0; i--) {
     fallingBlocks.get(i).render(0, 0, float(width)/32.0f, float(width)/32.0f, view);
   }
-  
-  
-  //Text
-  fill(255, 0, 0);
-  textSize(180);
-  text(mode, 170, 160);
+  dodging.render(0, 0, float(width)/32.0f, float(width)/32.0f, view);
  
-  
   
   
   drawMatrix(mode);
@@ -163,17 +209,17 @@ void noteOn(int _channel, int _pitch, int _velocity) {
 
   int x = _pitch%16;
   int y = _pitch/16;
-  println("Pressed: " + str(x) + "," + str(y) + str(frameCount));
-  
+  println("Pressed: " + str(x) + "," + str(y));
   
   //Mode 0
   if (mode == 0){
     for(int i=fallingBlocks.size()-1; i >= 0; i--){
-      if ((round(fallingBlocks.get(i).pos.x) == x) && (round(fallingBlocks.get(i).pos.y) == y)){
-        fallingBlocks.get(i).pos.y = 7;
-        fallingBlocks.get(i).velo = 16;
       }
-    }
+    //Move Player
+    if ((x>dodging.pos.x) && (x<8)) dodging.pos.x++;
+    if (x<dodging.pos.x) dodging.pos.x--;
+    if (y>dodging.pos.y) dodging.pos.y++;
+    if (y<dodging.pos.y) dodging.pos.y--;
   }
   
   
